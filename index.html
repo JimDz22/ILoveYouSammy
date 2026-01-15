@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Te Amo Sammy</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cutive+Mono&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-dark: #020111;
+    --bg-light: #101a3d;
+    --text-main: #e0f2f1;
+    --accent: #b3e5fc;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Playfair Display', serif;
+    background: linear-gradient(180deg, var(--bg-dark), var(--bg-light), var(--bg-dark));
+    background-size: 100% 400%;
+    animation: nightSky 20s ease infinite;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+  }
+
+  @keyframes nightSky {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 0% 100%; }
+  }
+
+  /* ✨ Título y Footer Fijos */
+  #header-title {
+    position: fixed;
+    top: 40px;
+    font-size: 1.2rem;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    font-weight: 400;
+    z-index: 10;
+  }
+
+  #footer-tag {
+    position: fixed;
+    bottom: 40px;
+    font-size: 0.9rem;
+    font-style: italic;
+    letter-spacing: 3px;
+    opacity: 0.4;
+    z-index: 10;
+  }
+
+  /* 🌌 Estrellas con movimiento */
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: none;
+    animation: drift linear infinite;
+  }
+
+  @keyframes drift {
+    from { transform: translateY(0); }
+    to { transform: translateY(-100vh); }
+  }
+
+  .star-glow {
+    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.3);
+  }
+
+  /* 📖 Contenedor de Letras */
+  #lyrics-container {
+    position: relative;
+    z-index: 5;
+    width: 85%;
+    max-width: 700px;
+    text-align: center;
+    min-height: 120px;
+  }
+
+  #lyrics {
+    font-family: 'Cutive Mono', monospace;
+    font-size: 1.8rem;
+    color: var(--text-main);
+    text-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+    display: inline-block;
+  }
+
+  .cursor::after {
+    content: "|";
+    margin-left: 8px;
+    display: inline-block;
+    animation: blink 0.8s infinite;
+    color: var(--accent);
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ▶ Botón Centrado */
+  #startBtn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 100;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    letter-spacing: 6px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.6s ease;
+    padding: 20px;
+  }
+
+  #startBtn:hover {
+    color: white;
+    letter-spacing: 10px;
+    text-shadow: 0 0 20px white;
+  }
+
+  @media (max-width: 600px) {
+    #lyrics { font-size: 1.3rem; }
+    #header-title { font-size: 0.9rem; letter-spacing: 4px; }
+  }
+</style>
+</head>
+
+<body>
+
+<div id="header-title">Para Sammy</div>
+
+<button id="startBtn">Te Amo</button>
+
+<div id="lyrics-container">
+  <div id="lyrics"></div>
+</div>
+
+<div id="footer-tag">Siempre habrá algo sobre ti</div>
+
+<audio id="song" src="SomethingAboutYou.mp3" loop></audio>
+
+<script>
+const lyricsData = [
+  { time: 0.5, text: "Creo que te amaré hasta que muera..." },
+  { time: 7.5, text: "Ella se ve como un sueño" },
+  { time: 11, text: "La chica más linda que nunca he visto" },
+  { time: 15, text: "De la portada de una revista…" },
+  { time: 19, text: "Y hay algo sobre ti, Sammy 💜" }
+];
+
+const song = document.getElementById("song");
+const lyricsEl = document.getElementById("lyrics");
+const btn = document.getElementById("startBtn");
+
+function createStars() {
+  const container = document.body;
+  for (let i = 0; i < 150; i++) {
+    const star = document.createElement("div");
+    star.className = "star";
+    const size = Math.random() * 2 + 0.5;
+    
+    if (Math.random() > 0.8) star.classList.add("star-glow");
+
+    star.style.width = size + "px";
+    star.style.height = size + "px";
+    star.style.left = Math.random() * 100 + "vw";
+    star.style.top = Math.random() * 100 + "vh";
+    
+    const duration = Math.random() * 50 + 50; 
+    star.style.animationDuration = `${duration}s`;
+    star.style.animationDelay = `-${Math.random() * duration}s`;
+    
+    star.style.opacity = Math.random() * 0.7 + 0.3;
+    
+    container.appendChild(star);
+  }
+}
+
+createStars();
+
+let typingTimeout;
+
+function typeWriter(text, i = 0) {
+  if (i === 0) {
+    lyricsEl.innerHTML = "";
+    lyricsEl.classList.add("cursor");
+  }
+
+  if (i < text.length) {
+    lyricsEl.innerHTML += text.charAt(i);
+    typingTimeout = setTimeout(() => typeWriter(text, i + 1), 70);
+  }
+}
+
+btn.addEventListener("click", () => {
+  btn.style.opacity = "0";
+  btn.style.pointerEvents = "none";
+  song.play();
+});
+
+let currentLineIndex = -1;
+
+song.addEventListener("timeupdate", () => {
+  const currentTime = song.currentTime;
+  
+  let index = -1;
+  for (let i = 0; i < lyricsData.length; i++) {
+    if (currentTime >= lyricsData[i].time) {
+      index = i;
+    }
+  }
+
+  if (index !== currentLineIndex && index !== -1) {
+    currentLineIndex = index;
+    clearTimeout(typingTimeout);
+    typeWriter(lyricsData[index].text);
+  }
+});
+
+song.addEventListener("seeked", () => {
+  if (song.currentTime < 1) {
+    currentLineIndex = -1;
+    lyricsEl.innerHTML = "";
+    lyricsEl.classList.remove("cursor");
+  }
+});
+
+</script>
+
+</body>
+</html>
